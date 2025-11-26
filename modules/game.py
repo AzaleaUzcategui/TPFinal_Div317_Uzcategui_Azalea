@@ -1,42 +1,61 @@
 # ---- Imports ----
 import pygame as py
 import modules.variables as var
-
+import sys
+import modules.forms.form_controller as form_controller
 
 
 # --- Game ---
 def mi_jueguito ():
+    """
+    Esta función dibuja la pantalla original, el ícono y la caption. Inicializa pygame y los
+    formularios
+
+    """
 
     py.init()
 
 
     # ---- DISPLAY ----
-    pantalla = py.display.set_mode((var.dimension_pantalla))
-    py.display.set_caption(var.titulo)
-    py.display.set_icon(var.icono_surface)
-    
+    pantalla = py.display.set_mode((var.DIMENSION_PANTALLA))
+    py.display.set_caption(var.TITULO)
+    py.display.set_icon(var.ICONO_SURFACE)
+
+
+    corriendo = True
+    reloj = py.time.Clock()
+    datos_juego = {
+        "puntaje": 0,
+        "cant_vidas": var.CANTIDAD_DE_VIDAS,
+        "player": {},
+        "music_volme": var.VOLUMEN_INICIAL
+    }
+
+
+
+    # ----- Controlador ----
+    form_control = form_controller.create_form_controller(pantalla, datos_juego)
+
+
 
 
     # ---- Bucle principal ----
-    while True:
-        for event in py.event.get():
+    while corriendo:
 
+        eventos = py.event.get()
+        reloj.tick(var.FPS)
 
-            if event.type == py.MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    posicion_inicial = list(event.pos)
-                    print(posicion_inicial)
-
-
+        for event in eventos:
 
             if event.type == py.QUIT:
                 print("Cerrando el juego")
-                py.quit()
-                quit()
-        
+                corriendo = False
+          
+
+        form_controller.update(form_control)
 
 
-        pantalla.fill((py.Color('black')))
-        
-        
-        py.display.update()
+        py.display.flip() #(update) es lo mismo
+    
+    py.quit()
+    sys.exit()
