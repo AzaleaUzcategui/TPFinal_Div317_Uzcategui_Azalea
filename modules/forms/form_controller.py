@@ -3,7 +3,9 @@ import pygame as py
 import modules.forms.form_menu as menu_form
 import modules.forms.form_rankings as ranking_form
 import modules.forms.form_opciones as options_form
+import modules.forms.form_pause as pause_form
 import modules.variables as var
+from utn_fra.pygame_widgets import MousePointer
 
 
 # --- funciones ---
@@ -21,6 +23,15 @@ def create_form_controller(screen: py.Surface, datos_juego: dict):
     controller['player'] = datos_juego.get('player')
     controller['enemy'] = None
     controller['music_config'] = datos_juego.get('music_config')
+
+    
+    cursor_img = py.image.load(var.MOUSE_POINTER)
+    size = cursor_img.get_size()
+    half_size =(size[0] //10, size[1]//10)
+    cursor_img = py.transform.scale(cursor_img, (half_size))
+
+    controller['mouse_cursor'] = MousePointer(controller.get('main_screen'), cursor_img)
+    controller['mouse_c'] = py.sprite.Group(controller.get('mouse_cursor'))
 
 
 
@@ -61,6 +72,18 @@ def create_form_controller(screen: py.Surface, datos_juego: dict):
              'screen_dimensions': var.DIMENSION_PANTALLA,
              'music_config': controller.get('music_config')
             }
+        ),
+        pause_form.create_pause_form(
+            {
+             'name': 'form_pause',
+             'screen': controller.get('main_screen'),
+             'active': False,
+             'coords': (0, 0),
+             'music_path': var.MUSICA_PAUSA,
+             'background': var.FONDO_PAUSA,
+             'screen_dimensions': var.DIMENSION_PANTALLA,
+             'music_config': controller.get('music_config')
+            }
         )
     ]
 
@@ -93,6 +116,10 @@ def forms_update(form_controller: dict):
                     form_opciones = lista_formularios[2]
                     options_form.update(form_opciones)
                     options_form.draw(form_opciones)
+                case 'form_pause':
+                    form_pause = lista_formularios[3]
+                    pause_form.update(form_pause)
+                    pause_form.draw(form_pause)
 
 
 
@@ -104,3 +131,6 @@ def update(form_controller:dict):
     comodidad.
     """
     forms_update(form_controller)
+    
+    form_controller.get('mouse_c').update()
+    form_controller.get('mouse_c').draw(form_controller.get('main_screen'))

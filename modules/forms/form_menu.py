@@ -54,6 +54,7 @@ def create_menu_form(dict_form_data: dict) -> dict:
         color = py.Color('white'),
         on_click = quit_game, on_click_param = None
     )
+    
 
 
     form['widgets_list'] = [
@@ -99,6 +100,10 @@ def event_handler():
     for event in events:
         if event.type == py.MOUSEBUTTONDOWN:
             print(f'coordenada mouse: {event.pos}')
+        if event.type == py.KEYDOWN:
+            if event.key == py.K_ESCAPE:
+                base_form.set_active('form_pause')
+            
 
 def update(dict_form_data:dict):
     """

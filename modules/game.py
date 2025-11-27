@@ -20,6 +20,7 @@ def mi_jueguito ():
     pantalla = py.display.set_mode((var.DIMENSION_PANTALLA))
     py.display.set_caption(var.TITULO)
     py.display.set_icon(var.ICONO_SURFACE)
+    py.mouse.set_visible(False)
 
 
     corriendo = True
