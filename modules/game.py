@@ -28,7 +28,12 @@ def mi_jueguito ():
         "puntaje": 0,
         "cant_vidas": var.CANTIDAD_DE_VIDAS,
         "player": {},
-        "music_volme": var.VOLUMEN_INICIAL
+        "music_config": {
+            "music_volme": var.VOLUMEN_INICIAL,
+            "music_on": True,
+            "music_init": False #Musica inicializada
+        }
+
     }
 
 

@@ -25,6 +25,17 @@ FUENTE_ALAGARD = "assets/fonts/alagard.ttf"
 dict_forms_status = {}
 
 
+# --- File ranking ----
+RANKING_CSV = 'modules/puntajes.csv'
+
 # ----------- imagenes ---------
-FONDO_MENU = 'assets/img/background/fondo_10.jpg'
-FONDO_RANKING = 'assets/img/background/fondo_12.png'
+FONDO_MENU = 'assets/img/forms/form_main_menu.png'
+FONDO_RANKING = 'assets/img/forms/form_ranking.png'
+FONDO_OPCIONES = 'assets/img/forms/form_options.png'
+
+
+
+# -------- Musica --------
+MUSICA_RANKING = 'assets/audio/music/form_ranking.ogg'
+MUSICA_MENU = 'assets/audio/music/menu_music.ogg'
+MUSICA_OPCIONES = 'assets/audio/music/form_options.ogg'

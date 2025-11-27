@@ -1,6 +1,7 @@
 # ---- Imports ----
 import pygame as py
 import modules.variables as var
+import modules.sonido as sonido
 
 def create_base_form(dict_form_data: dict) -> dict: 
     """
@@ -22,13 +23,13 @@ def create_base_form(dict_form_data: dict) -> dict:
     form['rect'] = form.get('surface').get_rect()
     form['rect'].x = dict_form_data.get('coords')[0]
     form['rect'].y = dict_form_data.get('coords')[1]
+    form['music_config'] = dict_form_data.get('music_config')
 
 
     return form
 
 
 # --- Creamos funciones comunes ----
-
 
 def cambiar_pantalla(form_name: dict):
     """
@@ -66,13 +67,38 @@ def update(form_data):
 
 def set_active (form_name: str):
     """
-    Activa el formulario que se le pasa por parametro
+    Activa el formulario que se le pasa por parametro. Activa música
     """
-    for form_n in var.dict_forms_status.keys():
-        if form_n != form_name:
-            var.dict_forms_status[form_n]['active'] = False
-        else:
-            var.dict_forms_status[form_n]['active'] = True
+    for form in var.dict_forms_status.values():
+        form['active'] = False
+
+    form_activo = var.dict_forms_status[form_name]
+    form_activo['active'] = True
+
+    music_off(form_activo) #Frena la música anterior (si existía)
+    music_on(form_activo)
+
+    
+
+
+def music_on(form_dict_data: dict):
+    """
+    Le da play a la musica
+    """
+    if form_dict_data.get('music_config').get('music_on'):
+        ruta_musica = form_dict_data.get('music_path')
+        
+        sonido.set_music_path(ruta_musica)
+        sonido.play_music()
+
+
+def music_off(form_dict_data: dict):
+    """
+    Detiene la música
+    """
+    if form_dict_data.get('music_config').get('music_on'):
+        sonido.stop_music()
+
 
 
 def draw(form_data: dict):

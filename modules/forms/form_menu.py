@@ -15,34 +15,43 @@ def create_menu_form(dict_form_data: dict) -> dict:
     form = base_form.create_base_form(dict_form_data)
 
     form['lbl_titulo'] = Label(
-        x = var.DIMENSION_PANTALLA[0]//2 - 250, y = 100,
+        x = var.DIMENSION_PANTALLA[0]//2, y = 150,
         text = 'Menu principal', screen = form.get('screen'),
-        font_path = var.FUENTE_ALAGARD, font_size = 45,
-        color = py.Color('black')
+        font_path = var.FUENTE_ALAGARD, font_size = 55,
+        color = py.Color('white')
         )
 
     form['btn_play'] = Button(
-        x = var.DIMENSION_PANTALLA[0]//2 - 250, y = 150,
+        x = var.DIMENSION_PANTALLA[0]//2, y = 360,
         text = 'Jugar', screen = form.get('screen'),
         font_path = var.FUENTE_ALAGARD, font_size = 40,
-        color = py.Color('black'),
+        color = py.Color('white'),
         on_click = imprimir_texto_boton, on_click_param = None
     )
 
     form['btn_ranking'] = Button(
-        x = var.DIMENSION_PANTALLA[0]//2 - 250, y = 200,
+        x = var.DIMENSION_PANTALLA[0]//2, y = 430,
         text = 'Rankings', screen = form.get('screen'),
         font_path = var.FUENTE_ALAGARD, font_size = 40,
-        color = py.Color('black'),
+        color = py.Color('white'),
         on_click = base_form.cambiar_pantalla, 
         on_click_param = 'form_ranking'
     )
 
+    form['btn_opciones'] = Button(
+        x = var.DIMENSION_PANTALLA[0]//2, y = 500,
+        text = 'Opciones', screen = form.get('screen'),
+        font_path = var.FUENTE_ALAGARD, font_size = 40,
+        color = py.Color('white'),
+        on_click = base_form.cambiar_pantalla, 
+        on_click_param = 'form_opciones'
+    )
+
     form['btn_exit'] = Button(
-        x = var.DIMENSION_PANTALLA[0]//2 - 250, y = 300,
+        x = var.DIMENSION_PANTALLA[0]//2, y = 575,
         text = 'Salir', screen = form.get('screen'),
         font_path = var.FUENTE_ALAGARD, font_size = 40,
-        color = py.Color('black'),
+        color = py.Color('white'),
         on_click = quit_game, on_click_param = None
     )
 
@@ -51,6 +60,7 @@ def create_menu_form(dict_form_data: dict) -> dict:
         form.get('lbl_titulo'),
         form.get('btn_play'),
         form.get('btn_ranking'),
+        form.get('btn_opciones'),
         form.get('btn_exit')
     ]
     
@@ -96,5 +106,9 @@ def update(dict_form_data:dict):
     """
     event_handler() 
     base_form.update_widget(dict_form_data)
+
+    if not dict_form_data.get('music_config').get('music_init'):
+        base_form.music_on(dict_form_data)
+        dict_form_data['music_config']['music_init'] = True
     
 

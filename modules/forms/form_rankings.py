@@ -4,6 +4,7 @@ import sys
 import modules.forms.form_base as base_form
 from utn_fra.pygame_widgets import (Label, Button)
 import modules.variables as var
+import modules.auxiliar as aux
 
 
 
@@ -20,22 +21,16 @@ def create_ranking_form(dict_form_data: dict) -> dict:
 
     form['data_loaded'] = False #Para probar si la data está cargada
 
-    form['lbl_titulo'] = Label(
-        x = var.DIMENSION_PANTALLA[0]//2 - 50, y = 50,
-        text = 'Dragon Ball Z || Trading card game', screen = form.get('screen'),
-        font_path = var.FUENTE_ALAGARD, font_size = 50,
-        color = py.Color('white')
-        )
 
     form['lbl_subtitulo'] = Label(
-        x = var.DIMENSION_PANTALLA[0]//2 - 250, y = 120,
-        text = 'Top 10 ranking', screen = form.get('screen'),
-        font_path = var.FUENTE_ALAGARD, font_size = 40,
+        x = var.DIMENSION_PANTALLA[0]//2, y = 100,
+        text = 'Top 8 ranking', screen = form.get('screen'),
+        font_path = var.FUENTE_ALAGARD, font_size = 60,
         color = py.Color('white')
         )
 
     form['btn_volver'] = Button(
-        x = var.DIMENSION_PANTALLA[0]//2 - 250, y = 500,
+        x = var.DIMENSION_PANTALLA[0]//2, y = 595,
         text = 'Volver', screen = form.get('screen'),
         font_path = var.FUENTE_ALAGARD, font_size = 35,
         color = py.Color('white'),
@@ -44,7 +39,6 @@ def create_ranking_form(dict_form_data: dict) -> dict:
 
     #Listita de wiches :3
     form['widgets_list'] = [
-        form.get('lbl_titulo'),
         form.get('lbl_subtitulo'),
         form.get('btn_volver')
     ]
@@ -64,15 +58,82 @@ def cambiar_formulario(param_list: list):
 
     print("Saliendo del form ranking")
     form_ranking['data_loaded'] = False
+    form_ranking['lista_ranking_screen'] = []
+    form_ranking['lista_ranking_file'] = []
     base_form.cambiar_pantalla(form_name)
+
+def init_ranking(form_dict_data: dict):
+    #form_dict_data['lista_ranking_screen'] = []
+    matriz = form_dict_data.get('lista_ranking_file')
+
+    posicion_y = var.DIMENSION_PANTALLA[1] //2 - 130
+
+    for indice_fila in range(len(matriz)):
+        fila = matriz[indice_fila]
+
+        """
+        POSICION         NOMBRE         SCORE
+        POSICION         NOMBRE         SCORE
+        POSICION         NOMBRE         SCORE
+        
+        """
+
+
+        placement = Label(
+        x = var.DIMENSION_PANTALLA[0]//2 - 100, y = posicion_y,
+        text = f'{indice_fila + 1}_ ', screen = form_dict_data.get('screen'),
+        font_path = var.FUENTE_ALAGARD, font_size = 30,
+        color = py.Color('white')
+        )
+        name = Label(
+        x = var.DIMENSION_PANTALLA[0]//2, y = posicion_y,
+        text = f'{fila[0]}', screen = form_dict_data.get('screen'),
+        font_path = var.FUENTE_ALAGARD, font_size = 25,
+        color = py.Color('white')
+        )
+        score = Label(
+        x = var.DIMENSION_PANTALLA[0]//2 + 100, y = posicion_y,
+        text = f'---- {fila[1]}', screen = form_dict_data.get('screen'),
+        font_path = var.FUENTE_ALAGARD, font_size = 25,
+        color = py.Color('white')
+        )
+
+
+        posicion_y += 40
+
+        form_dict_data['lista_ranking_screen'].append(placement)
+        form_dict_data['lista_ranking_screen'].append(name)
+        form_dict_data['lista_ranking_screen'].append(score)
+
+
+
+
+def inicializar_ranking_archivo(form_dict_data: dict):
+    """
+    Abre el archivo y lee los primeros 10 jugadores.
+    """
+    if not form_dict_data.get('data_loaded'):
+        form_dict_data['lista_ranking_file'] = aux.cargar_ranking(var.RANKING_CSV, top=8)
+        init_ranking(form_dict_data)
+        form_dict_data['data_load'] = True
 
 
 def draw (form_dict_data: dict):
+    """
+    Dibuja widgets
+    """
     base_form.draw(form_dict_data)
     base_form.draw_widgets(form_dict_data)
     #Widgets exclusivos de ranking.
+    for widget in form_dict_data.get('lista_ranking_screen'):
+        widget.draw()
+
 
 def update(form_dict_data: dict):
-    if form_dict_data.get('data_loaded') == True:
-        pass
+    """
+    Carga widgets
+    """
+    if not form_dict_data.get('data_loaded'):
+        inicializar_ranking_archivo (form_dict_data)
+
     base_form.update(form_dict_data)
