@@ -4,6 +4,8 @@ import modules.forms.form_base as base_form
 from utn_fra.pygame_widgets import (Label, Button)
 import modules.variables as var
 import sys
+import modules.stage as stage_logic
+import modules.forms.form_stage as stage_form
 
 
 # --- Funciones ---
@@ -26,7 +28,7 @@ def create_menu_form(dict_form_data: dict) -> dict:
         text = 'Jugar', screen = form.get('screen'),
         font_path = var.FUENTE_ALAGARD, font_size = 40,
         color = py.Color('white'),
-        on_click = imprimir_texto_boton, on_click_param = None
+        on_click = start_stage, on_click_param = None
     )
 
     form['btn_ranking'] = Button(
@@ -72,12 +74,10 @@ def create_menu_form(dict_form_data: dict) -> dict:
 
 
 def quit_game(_):
-    print("Saliendo del juego con el botón.")
+    print("Saliendo del juego con el boton.")
     py.quit()
     sys.exit()
 
-def imprimir_texto_boton(_):
-    print("Estamos presionando el boton 'JUGAR'")
 
 def draw(dict_form_data: dict):
     """
@@ -88,11 +88,9 @@ def draw(dict_form_data: dict):
 
 
 
-
-
 def event_handler():
     """
-    Verifica si está clickeando con el mouse, y en caso de que si, devuelve
+    Verifica si esta clickeando con el mouse, y en caso de que si, devuelve
     posicion
     """
     events = py.event.get()
@@ -100,10 +98,7 @@ def event_handler():
     for event in events:
         if event.type == py.MOUSEBUTTONDOWN:
             print(f'coordenada mouse: {event.pos}')
-        if event.type == py.KEYDOWN:
-            if event.key == py.K_ESCAPE:
-                base_form.set_active('form_pause')
-            
+        
 
 def update(dict_form_data:dict):
     """
@@ -117,3 +112,14 @@ def update(dict_form_data:dict):
         dict_form_data['music_config']['music_init'] = True
     
 
+def start_stage(_):
+    """
+    Resetea el stage y entra a la pantalla de juego.
+    """
+    stage = var.dict_forms_status.get('form_stage')
+    if stage:
+        stage_logic.reiniciar_stage(stage['stage'])
+        stage['last_tick'] = py.time.get_ticks()
+        stage_form.update_stats_labels(stage)
+        stage.get('lbl_last_result').update_text(text='Listo para jugar la primera mano', color=py.Color('white'))
+    base_form.cambiar_pantalla('form_stage')

@@ -1,0 +1,23 @@
+{
+  "nivel_1": {
+    "cantidades": {
+      "green_deck_expansion_1": 10,
+      "green_deck_expansion_2": 10,
+      "green_deck_expansion_3": 10,
+      "blue_deck_expansion_1": 5,
+      "blue_deck_expansion_2": 5,
+      "blue_deck_expansion_3": 5,
+      "red_deck_expansion_1": 5,
+      "red_deck_expansion_2": 5,
+      "red_deck_expansion_3": 5,
+      "purple_deck_expansion_1": 5,
+      "purple_deck_expansion_2": 5,
+      "silver_deck_expansion_1": 5,
+      "silver_deck_expansion_2": 5,
+      "silver_deck_expansion_3": 5,
+      "golden_deck_expansion_1": 2,
+      "black_deck_expansion_1": 2,
+      "platinum_deck_expansion_1": 2
+    }
+  }
+}

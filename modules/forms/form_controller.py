@@ -4,6 +4,7 @@ import modules.forms.form_menu as menu_form
 import modules.forms.form_rankings as ranking_form
 import modules.forms.form_opciones as options_form
 import modules.forms.form_pause as pause_form
+import modules.forms.form_stage as stage_form
 import modules.variables as var
 from utn_fra.pygame_widgets import MousePointer
 
@@ -79,10 +80,23 @@ def create_form_controller(screen: py.Surface, datos_juego: dict):
              'screen': controller.get('main_screen'),
              'active': False,
              'coords': (0, 0),
-             'music_path': var.MUSICA_PAUSA,
-             'background': var.FONDO_PAUSA,
+            'music_path': var.MUSICA_PAUSA,
+            'background': var.FONDO_PAUSA,
+            'screen_dimensions': var.DIMENSION_PANTALLA,
+            'music_config': controller.get('music_config')
+            }
+        ),
+        stage_form.create_stage_form(
+            {
+             'name': 'form_stage',
+             'screen': controller.get('main_screen'),
+             'active': False,
+             'coords': (0, 0),
+             'music_path': var.MUSICA_STAGE,
+             'background': var.FONDO_STAGE,
              'screen_dimensions': var.DIMENSION_PANTALLA,
-             'music_config': controller.get('music_config')
+             'music_config': controller.get('music_config'),
+             'config_path': None
             }
         )
     ]
@@ -120,6 +134,10 @@ def forms_update(form_controller: dict):
                     form_pause = lista_formularios[3]
                     pause_form.update(form_pause)
                     pause_form.draw(form_pause)
+                case 'form_stage':
+                    form_stage = lista_formularios[4]
+                    stage_form.update(form_stage)
+                    stage_form.draw(form_stage)
 
 
 

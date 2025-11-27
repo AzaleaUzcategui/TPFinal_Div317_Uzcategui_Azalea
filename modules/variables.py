@@ -34,9 +34,17 @@ FONDO_MENU = 'assets/img/forms/form_main_menu.png'
 FONDO_RANKING = 'assets/img/forms/form_ranking.png'
 FONDO_OPCIONES = 'assets/img/forms/form_options.png'
 FONDO_PAUSA = 'assets/img/forms/form_pause.png'
+FONDO_STAGE = 'assets/img/background_cards_simple.png'
 
 
 MOUSE_POINTER = 'assets/img/golden_frieza_pointer.png'
+
+
+# ---- botones (test) ----
+
+PLAY_BTN = 'assets/img/buttons_image/btn_play_hand.png'
+HEAL_BTN = 'assets/img/buttons_image/heal.png'
+SHIELD_BTN = 'assets/img/buttons_image/shield.png'
 
 
 
@@ -45,3 +53,4 @@ MUSICA_RANKING = 'assets/audio/music/form_ranking.ogg'
 MUSICA_MENU = 'assets/audio/music/menu_music.ogg'
 MUSICA_OPCIONES = 'assets/audio/music/form_options.ogg'
 MUSICA_PAUSA = 'assets/audio/music/form_pausa.ogg'
+MUSICA_STAGE = 'assets/audio/music/level_01.ogg'
