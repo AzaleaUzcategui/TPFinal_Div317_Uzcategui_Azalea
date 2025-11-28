@@ -6,6 +6,7 @@ import modules.variables as var
 import sys
 import modules.stage as stage_logic
 import modules.forms.form_stage as stage_form
+import modules.sonido as sonido
 
 
 # --- Funciones ---
@@ -97,6 +98,7 @@ def event_handler():
 
     for event in events:
         if event.type == py.MOUSEBUTTONDOWN:
+            sonido.play_click()
             print(f'coordenada mouse: {event.pos}')
         
 
@@ -121,5 +123,5 @@ def start_stage(_):
         stage_logic.reiniciar_stage(stage['stage'])
         stage['last_tick'] = py.time.get_ticks()
         stage_form.update_stats_labels(stage)
-        stage.get('lbl_last_result').update_text(text='Listo para jugar la primera mano', color=py.Color('white'))
+        stage['stage']['score_sent'] = False
     base_form.cambiar_pantalla('form_stage')

@@ -1,4 +1,21 @@
 {
+  "setup_path": "modules/stage_setup.json",
+  "stage_time_ms": 300000,
+  "points_per_hand": 150,
+  "points_mode": "fixed",
+  "bonus_by_stars": {
+    "1": 0.01,
+    "2": 0.02,
+    "3": 0.03,
+    "4": 0.04,
+    "5": 0.05,
+    "6": 0.06,
+    "7": 0.07,
+    "10": 0.10
+  },
+  "critical_pool": [1, 1, 1, 2, 3],
+  "deck_root": "assets/img/decks",
+  "nivel": "nivel_1",
   "nivel_1": {
     "cantidades": {
       "green_deck_expansion_1": 10,

@@ -50,7 +50,7 @@ def create_pause_form(dict_form_data: dict) -> dict:
         text = 'Menu', screen = form.get('screen'),
         font_path = var.FUENTE_ALAGARD, font_size = 40,
         color = py.Color('white'),
-        on_click = ir_al_menu, on_click_param = None
+        on_click = base_form.cambiar_pantalla, on_click_param = 'form_menu'
     )
 
     var.dict_forms_status[form.get('name')] = form
@@ -68,10 +68,16 @@ def create_pause_form(dict_form_data: dict) -> dict:
 
 
 def draw(form_dict_data: dict):
+    """
+    draw
+    """
     base_form.draw(form_dict_data)
     base_form.draw_widgets(form_dict_data)
 
 def update(form_dict_data: dict):
+    """
+    update
+    """
     base_form.update(form_dict_data)
 
 
@@ -89,7 +95,3 @@ def resume_stage(_):
     if stage:
         stage['last_tick'] = py.time.get_ticks()  # resetea el delta al volver
     base_form.cambiar_pantalla('form_stage')
-
-
-def ir_al_menu(_):
-    base_form.cambiar_pantalla('form_menu')

@@ -7,43 +7,16 @@ Card = Dict[str, float]
 Deck = List[Card]
 PlayerState = Dict[str, object]
 
-# Default configuration used when no JSON is provided.
+# Config mínima de respaldo: solo la ruta del setup.
 DEFAULT_CONFIG: Dict[str, object] = {
-    "stage_time_ms": 120_000,
-    "points_per_hand": 150,
-    "points_mode": "fixed",  # fixed | atk_minus_def
-    "bonus_by_stars": {
-        "1": 0.01,
-        "2": 0.02,
-        "3": 0.03,
-        "4": 0.04,
-        "5": 0.05,
-        "6": 0.06,
-        "7": 0.07,
-        "10": 0.10
-    },
-    "critical_pool": [1, 1, 1, 2, 3],
-    "deck_root": "assets/img/decks",
-    "setup_path": "modules/stage_setup.json",
-    "nivel": "nivel_1",
-    "deck_requirements": {}
+    "setup_path": "modules/stage_setup.json"
 }
 
 
 def cargar_config(config_path=None) -> Dict[str, object]:
-    if not config_path:
-        config_path = DEFAULT_CONFIG.get("setup_path")
-    path = Path(config_path)
-    if not path.exists():
-        return DEFAULT_CONFIG.copy()
-    try:
-        with open(path, "r", encoding="utf-8") as file:
-            loaded = json.load(file)
-        merged = DEFAULT_CONFIG.copy()
-        merged.update(loaded)
-        return merged
-    except Exception:
-        return DEFAULT_CONFIG.copy()
+    path = Path(config_path or DEFAULT_CONFIG.get("setup_path"))
+    with open(path, "r", encoding="utf-8") as file:
+        return json.load(file)
 
 
 def sumar_stats(deck: Deck) -> Dict[str, int]:
@@ -88,13 +61,16 @@ def parse_card_filename(file_path: Path) -> Card:
         "atk": atk,
         "def": defense,
         "stars": stars,
-        "image_path": str(file_path)
+        "image_path": str(file_path),
+        "deck": file_path.parent.name
     }
 
 
 def cargar_cartas_carpeta(folder: Path) -> List[Card]:
     cards = []
     for file in folder.glob("*.png"):
+        if "reverse" in file.stem.lower():
+            continue
         cards.append(parse_card_filename(file))
     return cards
 
@@ -119,11 +95,9 @@ def construir_mazo(deck_root: Path, cantidades: Dict[str, int]) -> Deck:
 def iniciar_stage(config_path=None, preset_config=None) -> Dict[str, object]:
     config = preset_config if preset_config is not None else cargar_config(config_path)
     nivel = config.get("nivel", "nivel_1")
-    deck_root = Path(config.get("deck_root", DEFAULT_CONFIG["deck_root"]))
+    deck_root = Path(config.get("deck_root", "assets/img/decks"))
 
     requisitos = config.get("deck_requirements") or config.get(nivel, {}).get("cantidades", {})
-    if not requisitos:
-        requisitos = DEFAULT_CONFIG.get("deck_requirements", {})
 
     player_deck = construir_mazo(deck_root, requisitos)
     enemy_deck = construir_mazo(deck_root, requisitos)
@@ -138,7 +112,8 @@ def iniciar_stage(config_path=None, preset_config=None) -> Dict[str, object]:
         "enemy": enemy,
         "time_left_ms": int(config.get("stage_time_ms", 120_000)),
         "finished": False,
-        "finished_reason": ""
+        "finished_reason": "",
+        "score_sent": False
     }
 
 
@@ -265,7 +240,7 @@ def chequear_fin_partida(player: PlayerState, enemy: PlayerState, time_left_ms: 
         return True, "enemy_hp_zero"
     if time_left_ms <= 0:
         return True, "time_over"
-    if (not player["deck"] or not enemy["deck"]) and player["stats"]["hp"] != enemy["stats"]["hp"]:
+    if not player["deck"] or not enemy["deck"]:
         return True, "deck_empty"
     return False, ""
 

@@ -35,10 +35,18 @@ FONDO_RANKING = 'assets/img/forms/form_ranking.png'
 FONDO_OPCIONES = 'assets/img/forms/form_options.png'
 FONDO_PAUSA = 'assets/img/forms/form_pause.png'
 FONDO_STAGE = 'assets/img/background_cards_simple.png'
+FONDO_NOMBRE = 'assets/img/forms/form_enter_name_0.png'
 
 
 MOUSE_POINTER = 'assets/img/golden_frieza_pointer.png'
 
+# -------- Sonidos --------
+SND_CLICK = 'assets/sound/click.mp3'
+SND_MANO_GANADA = 'assets/audio/sounds/item.mp3'
+
+# --- volumenes :3 ----
+MANO_GANADA_VOLUMEN = 10
+CLICK_VOLUME = 25
 
 # ---- botones (test) ----
 
@@ -54,3 +62,6 @@ MUSICA_MENU = 'assets/audio/music/menu_music.ogg'
 MUSICA_OPCIONES = 'assets/audio/music/form_options.ogg'
 MUSICA_PAUSA = 'assets/audio/music/form_pausa.ogg'
 MUSICA_STAGE = 'assets/audio/music/level_01.ogg'
+MUSICA_NOMBRE = 'assets/audio/music/win_music.ogg'
+
+

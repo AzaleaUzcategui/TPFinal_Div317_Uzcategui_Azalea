@@ -80,7 +80,7 @@ def init_ranking(form_dict_data: dict):
 
 
         placement = Label(
-        x = var.DIMENSION_PANTALLA[0]//2 - 100, y = posicion_y,
+        x = var.DIMENSION_PANTALLA[0]//2 - 110, y = posicion_y,
         text = f'{indice_fila + 1}_ ', screen = form_dict_data.get('screen'),
         font_path = var.FUENTE_ALAGARD, font_size = 30,
         color = py.Color('white')
@@ -92,8 +92,8 @@ def init_ranking(form_dict_data: dict):
         color = py.Color('white')
         )
         score = Label(
-        x = var.DIMENSION_PANTALLA[0]//2 + 100, y = posicion_y,
-        text = f'---- {fila[1]}', screen = form_dict_data.get('screen'),
+        x = var.DIMENSION_PANTALLA[0]//2 + 130, y = posicion_y,
+        text = f'-- {fila[1]}', screen = form_dict_data.get('screen'),
         font_path = var.FUENTE_ALAGARD, font_size = 25,
         color = py.Color('white')
         )
@@ -115,7 +115,7 @@ def inicializar_ranking_archivo(form_dict_data: dict):
     if not form_dict_data.get('data_loaded'):
         form_dict_data['lista_ranking_file'] = aux.cargar_ranking(var.RANKING_CSV, top=8)
         init_ranking(form_dict_data)
-        form_dict_data['data_load'] = True
+        form_dict_data['data_loaded'] = True
 
 
 def draw (form_dict_data: dict):

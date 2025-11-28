@@ -3,6 +3,7 @@ import pygame as py
 import modules.variables as var
 import sys
 import modules.forms.form_controller as form_controller
+import modules.sonido as sonido
 
 
 # --- Game ---
@@ -21,6 +22,10 @@ def mi_jueguito ():
     py.display.set_caption(var.TITULO)
     py.display.set_icon(var.ICONO_SURFACE)
     py.mouse.set_visible(False)
+
+    # Cargar sonido de click global
+    sonido.load_click(var.SND_CLICK)
+    sonido.set_click_volume(var.CLICK_VOLUME)
 
 
     corriendo = True
@@ -56,6 +61,8 @@ def mi_jueguito ():
             if event.type == py.QUIT:
                 print("Cerrando el juego")
                 corriendo = False
+            if event.type == py.MOUSEBUTTONDOWN:
+                sonido.play_click()
           
 
         form_controller.update(form_control)
