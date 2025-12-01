@@ -1,4 +1,4 @@
-# ---- Stage form ----
+﻿# ---- Stage form ----
 import pygame as py
 from pathlib import Path
 from utn_fra.pygame_widgets import Label, ButtonImage
@@ -112,6 +112,11 @@ def create_stage_form(dict_form_data: dict) -> dict:
 
 
 def update_stats_labels(form: dict) -> None:
+    """
+    Refresca kas stats, timer, puntaje
+
+    Muestra los botones de heal y shield hasta que se utilicen
+    """
     stage = form.get('stage')
     player = stage.get('player')
     enemy = stage.get('enemy')
@@ -146,14 +151,17 @@ def update_stats_labels(form: dict) -> None:
             form['widgets_list'].remove(btn_shield)
 
 def load_and_scale(image_path: str, size=(140, 200)) -> py.Surface:
+    """
+    Carga y escala la imagen
+    """
     surf = py.image.load(image_path).convert_alpha()
-    return py.transform.smoothscale(surf, size)
+    return py.transform.smoothscale(surf, size) #Lo tuve que buscar
 
 
 def back_surface(deck_name: str, config: dict, size=(140, 200)) -> py.Surface:
     """
     Intenta cargar el reverso real del mazo (archivo que contenga 'reverse' en el nombre).
-    Si no existe, genera un color de fallback.
+    Si no existe, devuelve un rectángulo negro
     """
     deck_root = Path(config.get("deck_root", "assets/img/decks"))
     deck_folder = deck_root / deck_name
@@ -165,15 +173,9 @@ def back_surface(deck_name: str, config: dict, size=(140, 200)) -> py.Surface:
     if reverse_file:
         return load_and_scale(str(reverse_file), size)
 
-    # Fallback de color
-    surf = py.Surface(size, py.SRCALPHA)
-    color_seed = abs(hash(deck_name)) % 255
-    color = (color_seed, 255 - color_seed, (color_seed // 2) % 255)
-    surf.fill(color)
-    font = py.font.Font(var.FUENTE_ALAGARD, 14)
-    text_surf = font.render(deck_name[:12], True, py.Color('black'))
-    rect = text_surf.get_rect(center=(size[0]//2, size[1]//2))
-    surf.blit(text_surf, rect)
+    # placeholder negro
+    surf = py.Surface(size)
+    surf.fill(py.Color('black'))
     return surf
 
 
@@ -186,7 +188,7 @@ def update_card_surfaces(form: dict, p_card: dict | None, e_card: dict | None):
     if e_card:
         form['card_faces']['cpu'] = load_and_scale(e_card.get('image_path'))
 
-    # Reversos: próxima carta del mazo si existe
+    # Reversos: proxima carta del mazo si existe
     stage_data = form.get('stage')
     p_next = stage_data['player']['deck'][0] if stage_data['player']['deck'] else None
     e_next = stage_data['enemy']['deck'][0] if stage_data['enemy']['deck'] else None
@@ -265,7 +267,6 @@ def use_heal(form: dict):
     if stage.get('finished') or not player.get('heal_available'):
         return
     stage_logic.aplicar_heal(player)
-    form.get('lbl_last_result').update_text(text='HEAL usado: stats restaurados', color=py.Color('white'))
     update_stats_labels(form)
 
 
@@ -275,7 +276,6 @@ def use_shield(form: dict):
     if stage.get('finished') or not player.get('shield_available'):
         return
     stage_logic.activar_shield(player)
-    form.get('lbl_last_result').update_text(text='SHIELD activado: proximo golpe rebota', color=py.Color('white'))
     update_stats_labels(form)
 
 
@@ -323,7 +323,7 @@ def determinar_ganador(player: dict, enemy: dict) -> str:
 
 def finalizar_stage(form: dict, reason: str):
     """
-    Marca fin de partida y envía al form_nombre con puntaje y resultado.
+    Marca fin de partida y envÃ­a al form_nombre con puntaje y resultado.
     """
     stage = form.get('stage')
     stage['finished'] = True
@@ -341,3 +341,5 @@ def finalizar_stage(form: dict, reason: str):
             form_nombre['lbl_input'].update_text(text='Nombre: ', color=py.Color('white'))
             form_nombre['lbl_resultado'].update_text(text=resultado, color=py.Color('white'))
             base_form.cambiar_pantalla('form_nombre')
+
+

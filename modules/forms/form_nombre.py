@@ -70,6 +70,9 @@ def create_nombre_form(dict_form_data: dict) -> dict:
 
 
 def set_puntaje(form: dict, puntaje: int):
+    """
+    Setea ultimo puntaje, y limpiamos el input :3
+    """
     form['last_score'] = puntaje
     form['lbl_score'].update_text(text=f'Puntaje: {puntaje}', color=py.Color('white'))
     form['input_text'] = ""
@@ -84,9 +87,14 @@ def set_resultado(form: dict, texto: str):
 
 
 def guardar_nombre(form: dict):
+    """
+    Toma un input (le seteo algo por las dudas) y el puntaje y lo
+    mete en nuestro archivo.
+    Cambia de pantalla
+    """
     nombre = form.get('input_text', "").strip()
     if not nombre:
-        nombre = "Anon"
+        nombre = "lolazo"
     puntaje = form.get('last_score', 0)
     # append al csv
     with open(var.RANKING_CSV, 'a', encoding='utf-8') as f:
@@ -96,6 +104,10 @@ def guardar_nombre(form: dict):
 
 
 def manejar_input(form: dict):
+    """
+    Procesa el teclado hasta el límite, enter para guardar, el backspace
+    updatea el lbl conla info
+    """
     for event in py.event.get():
         if event.type == py.KEYDOWN:
             if event.key == py.K_BACKSPACE:

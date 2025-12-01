@@ -1,25 +1,20 @@
 import json
 import random
 from pathlib import Path
-from typing import Dict, List, Tuple
-
-Card = Dict[str, float]
-Deck = List[Card]
-PlayerState = Dict[str, object]
 
 # Config mínima de respaldo: solo la ruta del setup.
-DEFAULT_CONFIG: Dict[str, object] = {
+DEFAULT_CONFIG: dict = {
     "setup_path": "modules/stage_setup.json"
 }
 
 
-def cargar_config(config_path=None) -> Dict[str, object]:
+def cargar_config(config_path=None) -> dict:
     path = Path(config_path or DEFAULT_CONFIG.get("setup_path"))
     with open(path, "r", encoding="utf-8") as file:
         return json.load(file)
 
 
-def sumar_stats(deck: Deck) -> Dict[str, int]:
+def sumar_stats(deck: list) -> dict:
     return {
         "hp": int(sum(card.get("hp", 0) for card in deck)),
         "atk": int(sum(card.get("atk", 0) for card in deck)),
@@ -27,7 +22,7 @@ def sumar_stats(deck: Deck) -> Dict[str, int]:
     }
 
 
-def armar_player(name: str, deck: Deck) -> PlayerState:
+def armar_player(name: str, deck: list) -> dict:
     base_stats = sumar_stats(deck)
     return {
         "name": name,
@@ -43,18 +38,19 @@ def armar_player(name: str, deck: Deck) -> PlayerState:
     }
 
 
-def parse_card_filename(file_path: Path) -> Card:
-    name_no_ext = file_path.stem
-    parts = name_no_ext.split("_")
-    # formato esperado: <pos>_HP_<hp>_ATK_<atk>_DEF_<def>_<stars>
-    hp = atk = defense = stars = 0
-    try:
-        hp = int(parts[2]) if len(parts) > 2 else 0
-        atk = int(parts[4]) if len(parts) > 4 else 0
-        defense = int(parts[6]) if len(parts) > 6 else 0
-        stars = int(parts[7]) if len(parts) > 7 else 1
-    except Exception:
-        stars = 1
+def parsear_nombre_carta(file_path: Path) -> dict:
+    """
+    Extrae datos del nombre de archivo y los pone en una lista (separando por
+    '_'), luego los asigna a su respectiva variable y pum, diccionario!!!!
+    """
+    name_no_ext = file_path.stem #nombre sin extension
+    partes = name_no_ext.split("_")
+
+    hp = int(partes[2]) if len(partes) > 2 and partes[2].isdigit() else 0
+    atk = int(partes[4]) if len(partes) > 4 and partes[4].isdigit() else 0
+    defense = int(partes[6]) if len(partes) > 6 and partes[6].isdigit() else 0
+    stars = int(partes[7]) if len(partes) > 7 and partes[7].isdigit() else 1
+
     return {
         "name": name_no_ext,
         "hp": hp,
@@ -66,35 +62,53 @@ def parse_card_filename(file_path: Path) -> Card:
     }
 
 
-def cargar_cartas_carpeta(folder: Path) -> List[Card]:
+def cargar_cartas_carpeta(folder: Path) -> list:
+    """
+    De vuelve una lista con las cartas de la carpeta, saltando las que tengan
+    reverse (esas no las queremos mostrar aca)
+    """
     cards = []
-    for file in folder.glob("*.png"):
+    for file in folder.glob("*.png"): #Iterador de rutas 
         if "reverse" in file.stem.lower():
             continue
-        cards.append(parse_card_filename(file))
+        cards.append(parsear_nombre_carta(file))
     return cards
 
 
-def elegir_cartas_random(folder: Path, cantidad: int) -> List[Card]:
+def elegir_cartas_random(folder: Path, cantidad: int) -> list:
+    """
+    Toma la carpeta y la cantidad, y devuelve una lista de cartas randomizadas
+    """
     cartas = cargar_cartas_carpeta(folder)
     if cantidad > len(cartas):
         cantidad = len(cartas)
     return random.sample(cartas, cantidad)
 
 
-def construir_mazo(deck_root: Path, cantidades: Dict[str, int]) -> Deck:
-    mazo: Deck = []
-    for folder_name, qty in cantidades.items():
-        folder_path = deck_root / folder_name
-        if folder_path.exists() and folder_path.is_dir():
-            mazo.extend(elegir_cartas_random(folder_path, qty))
-    random.shuffle(mazo)
+def construir_mazo(deck_root: Path, cantidades: dict) -> list:
+    """
+    Crea el mazo vacío, concatena las cartas por carpeta y después las mezcla
+    para que no queden una detrás de la otra
+    """
+    mazo = []
+    for nombre_carpeta, cantidad in cantidades.items():
+        carpeta = deck_root / nombre_carpeta
+        if carpeta.exists() and carpeta.is_dir():
+            mazo.extend(elegir_cartas_random(carpeta, cantidad))
+    random.shuffle(mazo) #shuflea JAJAJA
     return mazo
 
 
-def iniciar_stage(config_path=None, preset_config=None) -> Dict[str, object]:
+
+def iniciar_stage(config_path=None, preset_config=None) -> dict:
+    """
+    Carga config, busca nivel (cantidad de cartas x carpeta) y deck_root.
+    Arma los dos mazos con los requisitos por config.
+    Mezcla los mazos y retorna el estado del stage (inicial por ahora)
+    
+    """
     config = preset_config if preset_config is not None else cargar_config(config_path)
-    nivel = config.get("nivel", "nivel_1")
+    nivel = config.get("nivel", "nivel_1") #Nivel -> cantidades de carytas basically
     deck_root = Path(config.get("deck_root", "assets/img/decks"))
 
     requisitos = config.get("deck_requirements") or config.get(nivel, {}).get("cantidades", {})
@@ -117,37 +131,58 @@ def iniciar_stage(config_path=None, preset_config=None) -> Dict[str, object]:
     }
 
 
-def reiniciar_stage(stage: Dict[str, object]) -> None:
+def reiniciar_stage(stage: dict) -> None:
+    """
+    Setea todo a como estaba inicialmente y actualiza el diccionario
+    """
     config = stage.get("config", DEFAULT_CONFIG)
     new_stage = iniciar_stage(None, preset_config=config)
     stage.clear()
     stage.update(new_stage)
 
 
-def mezclar_mazos(player: PlayerState, enemy: PlayerState) -> None:
+def mezclar_mazos(player: dict, enemy: dict) -> None:
+    """
+    Shuflea los mazos
+    """
     random.shuffle(player["deck"])
     random.shuffle(enemy["deck"])
 
 
-def robar_cartas(player: PlayerState, enemy: PlayerState):
+def robar_cartas(player: dict, enemy: dict):
+    """
+    Si no hay mazos, no devuelve nada.
+    En caso de haber, saca la ultima carta de cada uno.
+    las deja en "last_card" y de paso, las deja en discard,
+    para no volver a llamarlas.
+    """
     if not player["deck"] or not enemy["deck"]:
         return None, None
-    p_card = player["deck"].pop(0)
-    e_card = enemy["deck"].pop(0)
-    player["last_card"] = p_card
-    enemy["last_card"] = e_card
-    player["discard"].append(p_card)
-    enemy["discard"].append(e_card)
-    return p_card, e_card
+    carta_jugador = player["deck"].pop(0)
+    carta_enemy = enemy["deck"].pop(0)
+    player["last_card"] = carta_jugador
+    enemy["last_card"] = carta_enemy
+    player["discard"].append(carta_jugador)
+    enemy["discard"].append(carta_enemy)
+    return carta_jugador, carta_enemy
 
 
-def ataque_carta_con_bonus(card: Card, bonus_map: Dict[str, float]) -> float:
+def ataque_carta_con_bonus(card: dict, bonus_map: dict) -> float:
+    """
+    Dependiendo de la estrella - > bonus
+    Obtiene las estrellas, busca el bonus en bonus_map, un diccionario con los valores, y
+    devuelve el valor del ataque con el bonus
+    """
     stars = int(card.get("stars", 1))
     bonus_pct = card.get("bonus", bonus_map.get(str(stars), 0))
     return card.get("atk", 0) * (1 + bonus_pct)
 
 
-def stats_carta_con_bonus(card: Card, bonus_map: Dict[str, float], crit_multiplier: int) -> Dict[str, int]:
+def stats_carta_con_bonus(card: dict, bonus_map: dict, crit_multiplier: int) -> dict:
+    """
+    Dependiendo del bonus, devuelve diccionario con hp,atk y def con el bonus (y el critico)
+    aplicados
+    """
     stars = int(card.get("stars", 1))
     bonus_pct = card.get("bonus", bonus_map.get(str(stars), 0))
     return {
@@ -157,49 +192,70 @@ def stats_carta_con_bonus(card: Card, bonus_map: Dict[str, float], crit_multipli
     }
 
 
-def elegir_critico(multiplier_pool: List[int]) -> int:
-    return random.choice(multiplier_pool or [1, 1, 2])
+def elegir_critico(criticos: list) -> int:
+    """
+    El gambling de los criticos jije (con lista x las dudas)
+    """
+    return random.choice(criticos or [1, 1, 2])
 
 
-def aplicar_danio(target: PlayerState, damage: Dict[str, int]) -> None:
+def aplicar_daño(target: dict, damage: dict) -> None:
+    """
+    resta los stats del target, sin bajar de 0.
+    le dejo valor por defecto 0 para que no rompa todo
+    """
     for stat in ("hp", "atk", "def"):
         target["stats"][stat] = max(0, int(target["stats"].get(stat, 0) - damage.get(stat, 0)))
 
 
-def aplicar_heal(player: PlayerState) -> None:
+def aplicar_heal(player: dict) -> None:
+    """
+    OP HEAL
+    Sana al player a su vida original (OP!!!)
+    """
     player["stats"] = player.get("base_stats", {}).copy()
-    player["heal_available"] = False
+    player["heal_available"] = False #De paso lo flageo para que no lo vuelva  usar
 
 
-def activar_shield(player: PlayerState) -> None:
+def activar_shield(player: dict) -> None:
+    """
+    Activa escudo
+    """
     player["shield_on"] = True
     player["shield_available"] = False
 
 
-def calcular_puntaje(player_wins: bool, winner_card: Card, loser_card: Card, mode: str, fixed_points: int) -> int:
-    if mode == "atk_minus_def":
-        return max(10, int(winner_card.get("atk", 0) - loser_card.get("def", 0)))
-    return int(fixed_points)
-
-
-def resolver_mano(player: PlayerState, enemy: PlayerState, config: Dict[str, object]) -> Dict[str, object]:
+def resolver_mano(player: dict, enemy: dict, config: dict) -> dict:
+    """
+    Funcion que lo une todo:
+     'roba' cartas del mazo
+     calcula los bonus y los criticos
+     calcula los puntajes y al ganador
+     aplica el daño -> Hasta considera el escudo como espero, para que devuelva
+     
+    Devuelve un diccionario con la informacion del ganador.
+    
+    """
     bonus_map = config.get("bonus_by_stars", {})
     crit_pool = config.get("critical_pool", [1, 1, 2])
-    points_mode = config.get("points_mode", "fixed")
     points_per_hand = int(config.get("points_per_hand", 100))
 
-    p_card, e_card = robar_cartas(player, enemy)
-    if not p_card or not e_card:
-        return {"finished": True, "reason": "deck_empty"}
+    player_card, enemy_card = robar_cartas(player, enemy)
+    if not player_card or not enemy_card:
+        return {"finished": True, "reason": "deck_empty"} #Si se acaban las cartas, termina
 
-    p_attack = ataque_carta_con_bonus(p_card, bonus_map)
-    e_attack = ataque_carta_con_bonus(e_card, bonus_map)
 
+    #Bonuses
+    player_attack = ataque_carta_con_bonus(player_card, bonus_map)
+    enemy_attack = ataque_carta_con_bonus(enemy_card, bonus_map)
     crit = elegir_critico(crit_pool)
-    player_wins = p_attack >= e_attack
+
+    #ganadores
+    player_wins = player_attack >= enemy_attack
     winner = player if player_wins else enemy
     loser = enemy if player_wins else player
-    winner_card = p_card if player_wins else e_card
+    winner_card = player_card if player_wins else enemy_card
+
 
     mirror_damage = loser.get("shield_on", False)
     if mirror_damage:
@@ -207,15 +263,9 @@ def resolver_mano(player: PlayerState, enemy: PlayerState, config: Dict[str, obj
 
     damage_target = loser if not mirror_damage else winner
     damage_stats = stats_carta_con_bonus(winner_card, bonus_map, crit)
-    aplicar_danio(damage_target, damage_stats)
+    aplicar_daño(damage_target, damage_stats)
 
-    score_gain = calcular_puntaje(
-        player_wins=player_wins,
-        winner_card=winner_card,
-        loser_card=e_card if player_wins else p_card,
-        mode=points_mode,
-        fixed_points=points_per_hand
-    )
+    score_gain = points_per_hand
     if player_wins:
         player["score"] += score_gain
     else:
@@ -226,14 +276,17 @@ def resolver_mano(player: PlayerState, enemy: PlayerState, config: Dict[str, obj
         "crit": crit,
         "player_wins": player_wins,
         "mirror": mirror_damage,
-        "p_card": p_card,
-        "e_card": e_card,
+        "p_card": player_card,
+        "e_card": enemy_card,
         "damage": damage_stats,
         "score_gain": score_gain
     }
 
 
-def chequear_fin_partida(player: PlayerState, enemy: PlayerState, time_left_ms: int) -> Tuple[bool, str]:
+def chequear_fin_partida(player: dict, enemy: dict, time_left_ms: int) -> tuple:
+    """
+    RAZONES DE FINISH
+    """
     if player["stats"]["hp"] <= 0:
         return True, "player_hp_zero"
     if enemy["stats"]["hp"] <= 0:
@@ -245,7 +298,10 @@ def chequear_fin_partida(player: PlayerState, enemy: PlayerState, time_left_ms: 
     return False, ""
 
 
-def tic_del_stage(stage: Dict[str, object], delta_ms: int) -> Tuple[bool, str]:
+def tic_del_stage(stage: dict, delta_ms: int) -> tuple:
+    """
+    Timer del stage. Chequea si terminó la partida y devuelve la razon.
+    """
     stage["time_left_ms"] = max(0, int(stage.get("time_left_ms", 0) - delta_ms))
     finished, reason = chequear_fin_partida(stage["player"], stage["enemy"], stage["time_left_ms"])
     if finished:

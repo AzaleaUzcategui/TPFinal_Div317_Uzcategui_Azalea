@@ -74,6 +74,7 @@ def draw(form_dict_data: dict):
     base_form.draw(form_dict_data)
     base_form.draw_widgets(form_dict_data)
 
+
 def update(form_dict_data: dict):
     """
     update
@@ -82,6 +83,9 @@ def update(form_dict_data: dict):
 
 
 def restart_stage_from_pause(_):
+    """
+    Cambia de pantalla, reiniciando el stage
+    """
     stage = var.dict_forms_status.get('form_stage')
     if stage:
         stage_logic.reiniciar_stage(stage['stage'])
@@ -91,7 +95,10 @@ def restart_stage_from_pause(_):
 
 
 def resume_stage(_):
+    """
+    Esta cambia de pantalla, respetando el timer
+    """
     stage = var.dict_forms_status.get('form_stage')
     if stage:
-        stage['last_tick'] = py.time.get_ticks()  # resetea el delta al volver
+        stage['last_tick'] = py.time.get_ticks() 
     base_form.cambiar_pantalla('form_stage')
