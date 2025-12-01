@@ -314,6 +314,9 @@ def update(form_dict_data: dict):
 
 
 def determinar_ganador(player: dict, enemy: dict) -> str:
+    """
+    Compara hp -> determina ganador
+    """
     if player['stats']['hp'] > enemy['stats']['hp']:
         return "Ganaste"
     if player['stats']['hp'] < enemy['stats']['hp']:
@@ -323,7 +326,7 @@ def determinar_ganador(player: dict, enemy: dict) -> str:
 
 def finalizar_stage(form: dict, reason: str):
     """
-    Marca fin de partida y envÃ­a al form_nombre con puntaje y resultado.
+    Marca fin de partida y envi­a al form_nombre con puntaje y resultado.
     """
     stage = form.get('stage')
     stage['finished'] = True
